@@ -1,0 +1,31 @@
+app:
+  name: robust-fastapi-api
+  version: "0.1.0"
+  description: API de referência FastAPI com boas práticas
+  debug: "${DEBUG:-false}"
+
+logging:
+  level: INFO
+  sensitive_keys:
+    - password
+    - access_token
+    - authorization
+    - token
+    - secret
+  ignore_paths:
+    - /docs
+    - /redoc
+    - /openapi.json
+    - /v1/health
+
+cors:
+  allow_origins: "${CORS_ALLOW_ORIGINS:-*}"
+  allow_credentials: "${CORS_ALLOW_CREDENTIALS:-true}"
+  allow_methods: "${CORS_ALLOW_METHODS:-'GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS'}"
+  allow_headers: "${CORS_ALLOW_HEADERS:-*}"
+
+database:
+  url: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+
+redis:
+  url: "redis://${REDIS_HOST}:${REDIS_PORT}/0"
