@@ -7,16 +7,19 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ....core.db.session import get_session
+from ...sse.sse_service import BooksSseService, get_books_sse_service
 from ..repositories.book_repository import BooksRepository
 from ..schemas.book_schemas import BookCreate, BookOut, BookUpdate
 
 
 class BooksService:
-    def __init__(self, repository: BooksRepository) -> None:
+    def __init__(self, repository: BooksRepository, sse: BooksSseService) -> None:
         self._repository = repository
+        self._sse = sse
 
     async def create_book(self, payload: BookCreate) -> BookOut:
         record = await self._repository.create(name=payload.name, is_read=payload.is_read)
+        await self._sse.notify_book_change(event="book_created", record=record)
         return BookOut(
             id=record.id,
             name=record.name,
@@ -59,6 +62,7 @@ class BooksService:
         )
         if record is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+        await self._sse.notify_book_change(event="book_updated", record=record)
         return BookOut(
             id=record.id,
             name=record.name,
@@ -71,6 +75,7 @@ class BooksService:
         record = await self._repository.soft_delete(book_id=book_id)
         if record is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+        await self._sse.notify_book_change(event="book_deleted", record=record)
         return BookOut(
             id=record.id,
             name=record.name,
@@ -82,5 +87,6 @@ class BooksService:
 
 def get_books_service(
     session: Annotated[AsyncSession, Depends(get_session)],
+    sse: Annotated[BooksSseService, Depends(get_books_sse_service)],
 ) -> BooksService:
-    return BooksService(repository=BooksRepository(session=session))
+    return BooksService(repository=BooksRepository(session=session), sse=sse)

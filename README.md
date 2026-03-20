@@ -104,6 +104,7 @@ To use another env file: `docker compose --env-file .env.production up --build`.
 - `GET /v1/books/{book_id}` – Get a single active book
 - `PATCH /v1/books/{book_id}` – Update book fields (name / read status)
 - `DELETE /v1/books/{book_id}` – Soft delete (`deleted_at` is set)
+- `GET /v1/sse/books` – Server-Sent Events stream (notifies on book changes)
 - `WS /v1/ws/chat` – WebSocket chat room (broadcast; send JSON `{"user": "name", "message": "text"}`)
 - `GET /docs` – Swagger UI
 - `GET /redoc` – ReDoc
@@ -128,6 +129,7 @@ robust-fastapi-api/
 │       │   │   │   └── book_repository.py
 │       │   │   └── schemas/
 │       │   │       └── book_schemas.py
+│       │   └── sse/           # SSE example (GET /v1/sse/books)
 │       │   └── socket/        # WebSocket chat (GET /v1/ws/chat)
 │       ├── core/
 │       │   ├── settings/      # YAML loader, Pydantic settings
