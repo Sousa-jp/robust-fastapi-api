@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                line-height: 1.4;
+                color: #4a4a4a;
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+            .header, .footer, .content {
+                max-width: 600px;
+                margin: 0 auto;
+                padding-left: 32px;
+                padding-right: 32px;
+            }
+            .header, .footer {
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+            .header {
+                text-align: center;
+                color: #2c3e50;
+                background: linear-gradient(to right, #ffe3ffd3 60%, #e3f2ff);
+                border-radius: 12px;
+                margin-bottom: 30px;
+            }
+            .logo {
+                max-width: 200px;
+                height: auto;
+                margin-bottom: 15px;
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+            .content {
+                padding-top: 30px;
+                padding-bottom: 30px;
+                background: #fff;
+            }
+            .content-inner {
+                padding: 0;
+            }
+            .content p {
+                margin: 10px 0;
+                font-size: 16px;
+            }
+            .button-wrapper {
+                text-align: center;
+            }
+            .button {
+                display: inline-block;
+                margin: 24px 0;
+                padding: 12px 32px;
+                background: #00BEFF;
+                color: #fff;
+                border-radius: 4px;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #4a4a4a;
+                background: linear-gradient(to right, #ffe3ffd3 60%, #e3f2ff);
+                border-radius: 12px;
+            }
+            .footer p {
+                margin: 0 0 2px 0;
+                line-height: 1.2;
+            }
+            .highlight {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            .footer-content {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                max-width: 500px;
+                margin: 0 auto;
+                height: 64px;
+            }
+            .footer-logo-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                margin-right: 20px;
+            }
+            .footer-logo {
+                width: auto;
+                height: 30px;
+                object-fit: contain;
+            }
+            .footer-text {
+                text-align: left;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 100%;
+            }
+            .footer-text p {
+                margin: 0 0 2px 0;
+                line-height: 1.2;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <img src="https://cdn.prod.website-files.com/653ff55cffa885d43e1a7bfa/6672e8383dbaa6bd3e8e527c_logo-xerticaAi.png" alt="Xertica.ai Logo" class="logo">
+            <h2>Activate Your Account</h2>
+        </div>
+        <div class="content">
+            <div class="content-inner">
+                <p>Hello {{ user_name }},</p>
+                <p>Thank you for registering with us. To complete your registration and activate your account, please click the button below. <br><span class="highlight">This link will expire in 10 minutes.</span></p>
+            </div>
+            <div class="button-wrapper">
+                <a href="{{ verify_url }}" class="button">Activate Account</a>
+            </div>
+            <div class="content-inner">
+                <p>If the button above does not work, copy and paste the following link into your browser:</p>
+                <p style="word-break:break-all;">{{ verify_url }}</p>
+                <p class="highlight">For security reasons, do not share this link with anyone.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height: 64px;">
+                <tr>
+                    <td width="50" align="center" valign="middle" style="padding-right:40px;">
+                        <img src="https://cdn.prod.website-files.com/653ff55cffa885d43e1a7bfa/667353e8dc3f838358b9a4bb_logo-xertica-rodape.png" alt="Xertica.ai Footer Logo" style="height:30px; width:auto; display:block;">
+                    </td>
+                    <td align="center" valign="middle">
+                        <p style="margin:0 0 2px 0; line-height:1.2; text-align:center;">This is an automated email, please do not reply.</p>
+                        <p style="margin:0; line-height:1.2; text-align:center;">© 2025 Access Control System. All rights reserved.</p>
+                    </td>
+                    <td width="50"></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
+
