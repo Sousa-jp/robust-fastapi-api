@@ -87,4 +87,3 @@ def get_chat_channel() -> str:
 async def get_socket_chat_service() -> SocketChatService:
     redis = await get_redis_client()
     return SocketChatService(redis=redis, channel=get_chat_channel())
-

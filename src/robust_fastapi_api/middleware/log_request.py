@@ -10,7 +10,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.concurrency import iterate_in_threadpool
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
 
 from ..core.settings import settings
 
@@ -82,10 +82,13 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
         duration_ms = (time.perf_counter() - start) * 1000
         response_body_bytes = b""
         try:
-            chunks = [section async for section in response.body_iterator]
-            response.body_iterator = iterate_in_threadpool(iter(chunks))
-            if chunks:
-                response_body_bytes = b"".join(chunks)
+            is_sse = isinstance(response, StreamingResponse) and response.media_type == "text/event-stream"
+            is_sse_header = response.headers.get("content-type", "").startswith("text/event-stream")
+            if not is_sse and not is_sse_header:
+                chunks = [section async for section in response.body_iterator]
+                response.body_iterator = iterate_in_threadpool(iter(chunks))
+                if chunks:
+                    response_body_bytes = b"".join(chunks)
         except Exception:
             pass
 
