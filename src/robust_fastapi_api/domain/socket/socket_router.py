@@ -1,11 +1,10 @@
-import json
-from typing import Set
+from typing import Annotated
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, WebSocket
+
+from .socket_service import SocketChatService, get_socket_chat_service
 
 router = APIRouter(prefix="/ws", tags=["websocket"])
-
-_active: Set[WebSocket] = set()
 
 
 @router.get(
@@ -27,22 +26,8 @@ def chat_doc() -> dict:
 
 
 @router.websocket("/chat")
-async def chat(websocket: WebSocket) -> None:
-    await websocket.accept()
-    _active.add(websocket)
-    try:
-        while True:
-            raw = await websocket.receive_text()
-            data = json.loads(raw) if raw.strip() else {}
-            user = data.get("user", "anonymous")
-            message = data.get("message", raw)
-            payload = json.dumps({"user": user, "message": message})
-            for conn in list(_active):
-                try:
-                    await conn.send_text(payload)
-                except Exception:
-                    _active.discard(conn)
-    except WebSocketDisconnect:
-        pass
-    finally:
-        _active.discard(websocket)
+async def chat(
+    websocket: WebSocket,
+    service: Annotated[SocketChatService, Depends(get_socket_chat_service)],
+) -> None:
+    await service.handle_chat(websocket=websocket)
