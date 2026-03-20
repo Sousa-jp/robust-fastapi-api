@@ -3,6 +3,7 @@ app:
   version: "0.1.0"
   description: API de referência FastAPI com boas práticas
   debug: "${DEBUG:-false}"
+  timezone: "${APP_TIMEZONE:-UTC}"
 
 logging:
   level: INFO

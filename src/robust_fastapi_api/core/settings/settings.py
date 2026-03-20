@@ -12,6 +12,7 @@ class AppSettings(HeadSettings):
     version: str
     description: str
     debug: bool
+    timezone: str = "UTC"
 
 
 class LoggingSettings(HeadSettings):

@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .core.logging import configure_logging
 from .core.settings import settings
+from .domain.crud.routers.book_router import router as books_router
+from .domain.socket.socket_router import router as socket_router
 from .health import router as health_router
 from .middleware.log_request import LogRequestMiddleware
 from .middleware.sanitize import SanitizeMiddleware
@@ -26,3 +28,5 @@ app.add_middleware(
 app.add_middleware(SanitizeMiddleware)
 
 app.include_router(health_router, prefix="/v1")
+app.include_router(books_router, prefix="/v1")
+app.include_router(socket_router, prefix="/v1")

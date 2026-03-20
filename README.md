@@ -47,6 +47,8 @@ Activate the environment (optional; `poetry run` works without it):
 eval "$(poetry env activate)"
 ```
 
+This runs `eval "$(poetry env activate)"` inside a shell. When you exit, your terminal returns to the previous state.
+
 ## Configuration
 
 Main configuration lives in `settings/base.yaml`. Values can reference environment variables with `${VAR}` or `${VAR:-default}`. The app loads a `.env` file from the project root at startup, so variables defined there are available for substitution. When running with Docker Compose, env vars can also be set in `.env` and are passed to the API container.
@@ -97,6 +99,12 @@ To use another env file: `docker compose --env-file .env.production up --build`.
 ## Endpoints
 
 - `GET /v1/health` – Health check (API status plus database and Redis: `ok`, `error`, or `disabled`)
+- `POST /v1/books` – Create a book record
+- `GET /v1/books` – List active books (soft-deleted are excluded)
+- `GET /v1/books/{book_id}` – Get a single active book
+- `PATCH /v1/books/{book_id}` – Update book fields (name / read status)
+- `DELETE /v1/books/{book_id}` – Soft delete (`deleted_at` is set)
+- `WS /v1/ws/chat` – WebSocket chat room (broadcast; send JSON `{"user": "name", "message": "text"}`)
 - `GET /docs` – Swagger UI
 - `GET /redoc` – ReDoc
 
@@ -110,6 +118,17 @@ robust-fastapi-api/
 │   └── robust_fastapi_api/
 │       ├── app.py             # FastAPI app, middleware, router registration
 │       ├── health.py          # Health router (GET /v1/health)
+│       ├── domain/
+│       │   ├── crud/          # CRUD example (books read, with soft delete via `deleted_at`)
+│       │   │   ├── routers/
+│       │   │   │   └── book_router.py
+│       │   │   ├── services/
+│       │   │   │   └── book_service.py
+│       │   │   ├── repositories/
+│       │   │   │   └── book_repository.py
+│       │   │   └── schemas/
+│       │   │       └── book_schemas.py
+│       │   └── socket/        # WebSocket chat (GET /v1/ws/chat)
 │       ├── core/
 │       │   ├── settings/      # YAML loader, Pydantic settings
 │       │   ├── logging.py     # Structlog configuration
