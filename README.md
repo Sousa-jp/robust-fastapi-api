@@ -97,6 +97,7 @@ To use another env file: `docker compose --env-file .env.production up --build`.
 ## Endpoints
 
 - `GET /v1/health` – Health check (API status plus database and Redis: `ok`, `error`, or `disabled`)
+- `WS /v1/ws/chat` – WebSocket chat room (broadcast; send JSON `{"user": "name", "message": "text"}`)
 - `GET /docs` – Swagger UI
 - `GET /redoc` – ReDoc
 
@@ -110,6 +111,8 @@ robust-fastapi-api/
 │   └── robust_fastapi_api/
 │       ├── app.py             # FastAPI app, middleware, router registration
 │       ├── health.py          # Health router (GET /v1/health)
+│       ├── domain/
+│       │   └── socket/        # WebSocket chat (GET /v1/ws/chat)
 │       ├── core/
 │       │   ├── settings/      # YAML loader, Pydantic settings
 │       │   ├── logging.py     # Structlog configuration
