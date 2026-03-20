@@ -8,14 +8,16 @@ Reference FastAPI API with production-oriented practices: YAML-based configurati
 
 - **Observability** – Structured logs (request/response audit, sensitive redaction) and health checks (API, database, Redis).
 - **Security** – Input sanitization (SQL injection and XSS) via middleware; reject suspicious payloads before handlers.
+- **Auth (local)** – JWT access/refresh plus account activation and password reset via email.
+- **Auth (OAuth/PKCE)** – OAuth login with Google/Microsoft using PKCE + callback (requires session/cookies).
+- **Real-time** – WebSockets and Server-Sent Events (SSE) using Redis Pub/Sub.
+- **Data** – SQL CRUD (PostgreSQL) example with soft delete via `deleted_at` (UUID IDs).
 - **Versioning** – API under `/v1/` to allow future backward-compatible changes.
 - **Containerization** – Docker and Docker Compose for API, PostgreSQL, and Redis.
 
-**Planned**
 
-- **Real-time** – WebSockets and Server-Sent Events (SSE).
-- **Auth** – Authentication and role-based authorization.
-- **Data** – SQL CRUD (PostgreSQL), in-memory cache with Redis, NoSQL CRUD.
+**Planned**
+- **Data** – Redis cache strategy and NoSQL CRUD (future examples).
 - **Integrations** – External APIs and payment providers.
 
 ## Introduction
@@ -99,6 +101,16 @@ To use another env file: `docker compose --env-file .env.production up --build`.
 ## Endpoints
 
 - `GET /v1/health` – Health check (API status plus database and Redis: `ok`, `error`, or `disabled`)
+- `POST /v1/auth/login` – Login with email/password (returns access + refresh tokens)
+- `POST /v1/auth/validate` – Validate current access token (returns `user_id` and `token_valid`)
+- `POST /v1/auth/refresh` – Refresh access token using the current refresh token
+- `POST /v1/auth/logout` – Logout (invalidates access + refresh versions)
+- `POST /v1/auth/password-reset/request` – Request password reset (sends email with verification code)
+- `POST /v1/auth/password-reset/verify` – Verify password reset code
+- `POST /v1/auth/password-reset/confirm` – Confirm password reset (sets new password)
+- `POST /v1/users/me` – Create/update an unverified account + send activation email
+- `POST /v1/users/activate?token=...` – Activate account using activation token from email
+- `GET /v1/users/me` – Get current user info (requires access token)
 - `POST /v1/books` – Create a book record
 - `GET /v1/books` – List active books (soft-deleted are excluded)
 - `GET /v1/books/{book_id}` – Get a single active book
@@ -120,6 +132,27 @@ robust-fastapi-api/
 │       ├── app.py             # FastAPI app, middleware, router registration
 │       ├── health.py          # Health router (GET /v1/health)
 │       ├── domain/
+│       │   ├── auth/          # Auth example (JWT login + activation + password reset)
+│       │   │   ├── routers/
+│       │   │   │   └── auth_router.py
+│       │   │   └── services/
+│       │   │       └── auth_service.py
+│       │   └── users/         # Users example (unverified users + activation + users/me)
+│       │       ├── routers/
+│       │       │   └── users_router.py
+│       │       ├── services/
+│       │       │   ├── unverified_user_service.py
+│       │       │   └── user_service.py
+│       │       ├── repositories/
+│       │       │   ├── user_repository.py
+│       │       │   ├── unverified_user_repository.py
+│       │       │   └── oauth_token_repository.py
+│       │       ├── models/
+│       │       │   ├── user_model.py
+│       │       │   ├── unverified_user_model.py
+│       │       │   └── oauth_token_model.py
+│       │       └── schemas/
+│       │           └── models.py
 │       │   ├── crud/          # CRUD example (books read, with soft delete via `deleted_at`)
 │       │   │   ├── routers/
 │       │   │   │   └── book_router.py
@@ -127,16 +160,35 @@ robust-fastapi-api/
 │       │   │   │   └── book_service.py
 │       │   │   ├── repositories/
 │       │   │   │   └── book_repository.py
+│       │   │   ├── models/
+│       │   │   │   └── book_model.py
 │       │   │   └── schemas/
 │       │   │       └── book_schemas.py
 │       │   └── sse/           # SSE example (GET /v1/sse/books)
+│       │       ├── sse_router.py
+│       │       └── sse_service.py
 │       │   └── socket/        # WebSocket chat (GET /v1/ws/chat)
+│       │       ├── socket_router.py
+│       │       └── socket_service.py
 │       ├── core/
 │       │   ├── settings/      # YAML loader, Pydantic settings
 │       │   ├── logging.py     # Structlog configuration
 │       │   ├── health.py      # Database and Redis check functions
+│       │   ├── datetime.py    # Timezone-aware datetime helpers
+│       │   ├── db/
+│       │   │   ├── base.py
+│       │   │   └── session.py
+│       │   ├── redis/
+│       │   │   └── session.py
+│       │   ├── email/
+│       │   │   ├── email.py
+│       │   │   └── templates/
+│       │   │       ├── account_activation.html
+│       │   │       └── password_reset.html
 │       │   └── security/
-│       │       └── sanitizer.py  # SQL/XSS pattern detection
+│       │       ├── sanitizer.py  # SQL/XSS pattern detection
+│       │       ├── token.py
+│       │       └── password.py
 │       └── middleware/
 │           ├── log_request.py # Request/response audit logging
 │           └── sanitize.py   # Input sanitization middleware
