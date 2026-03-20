@@ -13,7 +13,9 @@ dependencies = [
     "pydantic-settings (>=2.13.1,<3.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
     "redis (>=7.2.1,<8.0.0)",
-    "structlog (>=25.5.0,<26.0.0)"
+    "structlog (>=25.5.0,<26.0.0)",
+    "sqlalchemy[asyncio] (>=2.0.48,<3.0.0)",
+    "alembic (>=1.18.4,<2.0.0)"
 ]
 
 [tool.poetry]
@@ -36,7 +38,7 @@ dev = [
 
 [tool.ruff]
 line-length = 120
-extend-exclude = ['migrations']
+extend-exclude = ['alembic']
 
 [tool.ruff.lint]
 preview = true
@@ -56,7 +58,7 @@ pre_format = 'ruff check --fix'
 format = 'ruff format '
 pre_build = 'task format'
 build = 'docker compose up --build'
-pre_dev = 'task format && docker compose up -d database redis'
+pre_dev = 'task format && docker compose up -d database redis && poetry run alembic upgrade head'
 dev = 'poetry run uvicorn --host 0.0.0.0 --port 8080 robust_fastapi_api.app:app --reload --reload-include "settings/*.yaml" --reload-include ".env"'
 pre_test = 'task format'
 test = 'pytest -s -x --cov=robust_fastapi_api -vv --cov-fail-under=90'
